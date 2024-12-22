@@ -1,13 +1,5 @@
 # Sort Photos and Videos by Date
 
-After spending a bunch of time looking for some fee software or a simple way to achive this and failing I decided to have a go at it myself. I really liked the way OneDrive sorted my photos and videos with its Photo backup from my phone in to <Year>\<Month> subfolders, however I had a bunch of existing media that I wanted to quickly move and sort in the same way. After searching arround for various pieces of sofware or scripts and getting frustrated, I decided to put together this with a bit of help from AI.
-
-A PowerShell script I put together with the help of AI to organize photos and videos into subfolders by year and month, based on the `Date taken` or `Media created` metadata properties. This script is intended for cleaning up your media library, especially if you have thousands photo and video files from various devices that you wish to organise and catalogue by year and month.
-
-
-
-# Sort Photos and Videos by Date
-
 After struggling to find free software or a simple solution to organise my photos and videos, I decided to build this script. I liked how OneDrive automatically sorts media from my phone into `<Year>\<Month>` subfolders and wanted to apply the same structure to a large collection of existing media files. Frustrated with existing tools and options, I created this script with a bit of help (AI).
 
 This PowerShell script organises photos and videos into subfolders by year and month, based on the `Date Taken`, `Media Created`, or (as a fallback) `Date Modified` metadata properties. It's great for cleaning up and cataloguing media libraries, especially when dealing with thousands of files from various devices and/or sources.
