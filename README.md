@@ -44,10 +44,8 @@ Follow the on-screen prompts to provide the target directory and confirm actions
 
 ## Screenshots
 
-![Example Screenshot](screenshots/20241222_130747.png)
-
-![Example Screenshot](screenshots/20241222_130845.png)
-
-![Example Screenshot](screenshots/20241222_131630.png)
+![Example Screenshot](screenshots/1.png)  
+![Example Screenshot](screenshots/2.png)  
+![Example Screenshot](screenshots/3.png)  
 
 
