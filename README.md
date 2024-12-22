@@ -35,7 +35,7 @@ This PowerShell script organises photos and videos into subfolders by year and m
 
 1. Clone the repository: `git clone https://github.com/jackbrumley/media-date-sorter.git`
 2. Navigate to the script's directory: `cd media-date-sorter`
-3. Run the script: `.\media-date-sorter.ps1` and you will be prompted for your directory or
+3. Run the script: `.\media-date-sorter.ps1` and you will be prompted for your directory or  
 Run the script with the path specified: `.\media-date-sorter.ps1 -TargetDirectory "C:\Users\admin\Photos\Unsorted Media"`
 
 Follow the on-screen prompts to provide the target directory and confirm actions.
