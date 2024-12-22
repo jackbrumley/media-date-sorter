@@ -1,17 +1,16 @@
 <#
 .SYNOPSIS
-  Sorts files in a target directory into Year\Month subfolders based on metadata properties.
+  Sorts files in a target directory based on Windows Shell's "Date taken" 
+  or "Media created" property. Files are placed into Year\Month subfolders.
 
 .DESCRIPTION
   - Prompts for a target directory to process.
   - Reads metadata properties (`Date Taken` or `Media Created`) from files.
-  - Falls back to `Date Modified` if no `Date Taken` or `Media Created` properties are found.
-  - Skips files with no valid date metadata (`Date Taken`, `Media Created`, or `Date Modified`).
-  - Previews all files in a color-coded table, showing dates and destinations.
-  - Prompts to confirm moving files with trusted dates (`Date Taken` or `Media Created`).
-  - Optionally moves files using `Date Modified` for skipped files.
-  - Moves files into `Year\Month` subfolders (e.g., `2023\12` for December 2023).
-  - Exports a timestamped CSV file documenting all files and actions into a "logs" subfolder.
+  - Previews valid and skipped files in a table.
+  - Moves valid files into subfolders named Year\Month.
+  - Falls back to `Date Modified` for skipped files.
+  - Exports the final table of all actions to a timestamped CSV file in a "logs" subfolder.
+  - Logs all key actions, including errors, skipped files, and user decisions, into a timestamped log file.
 #>
 
 param(
@@ -55,14 +54,36 @@ function Try-ParseDate {
   }
 }
 
-# Function: Log messages
+# Prepare the logs directory
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$LogDir = Join-Path $ScriptDir "logs"
+Ensure-LogsDirectory -Path $LogDir
+
+# Generate timestamp for log and CSV files
+$Timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+
+# Prepare the log file path
+$LogFile = "${Timestamp}_SortLog.log"
+$LogPath = Join-Path $LogDir $LogFile
+
+# Prepare the CSV file path
+$CsvFile = "${Timestamp}_SortResults.csv"
+$CsvPath = Join-Path $LogDir $CsvFile
+
+# Function: Log messages to both console and log file
 function Log-Message {
   param (
     [string]$Message,
     [string]$Level = "Info"
   )
-  $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-  Write-Host "[$Timestamp][$Level] $Message"
+  $Timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+  $LogEntry = "[$Timestamp][$Level] $Message"
+
+  # Append to the log file
+  Add-Content -Path $LogPath -Value $LogEntry
+
+  # Write to the console without timestamp
+  Write-Host "[$Level] $Message"
 }
 
 # Prompt for the directory if not provided
@@ -73,22 +94,16 @@ if (-not $TargetDirectory) {
 
 # Validate the directory
 if (-not (Test-Path $TargetDirectory)) {
-  Write-Host "The specified directory does not exist." -ForegroundColor Red
+  Log-Message "The specified directory does not exist." "Error"
   exit
 }
 
-# Prepare the logs directory
-$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$LogDir = Join-Path $ScriptDir "logs"
-Ensure-LogsDirectory -Path $LogDir
-
-# Prepare the CSV file path
-$CsvFile = "SortResults_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"
-$CsvPath = Join-Path $LogDir $CsvFile
+Log-Message "Script started. Target directory: $TargetDirectory"
 
 # Get all files in the target directory
 $Files = Get-ChildItem -Path $TargetDirectory -File
 $AllFiles = @()
+$SkippedFiles = @()
 
 # Process each file
 foreach ($File in $Files) {
@@ -148,6 +163,7 @@ foreach ($File in $Files) {
         Date = "N/A"
         Destination = "N/A"
       }
+      $SkippedFiles += $File
     }
   } catch {
     $AllFiles += [PSCustomObject]@{
@@ -156,6 +172,7 @@ foreach ($File in $Files) {
       Date = "N/A"
       Destination = "N/A"
     }
+    Log-Message "Failed to process file: $($File.FullName)" "Error"
   }
 }
 
@@ -187,7 +204,7 @@ Write-Host ""
 
 # Export table to CSV
 $AllFiles | Export-Csv -Path $CsvPath -NoTypeInformation
-Write-Host "File list exported to CSV: $CsvPath" -ForegroundColor White
+Log-Message "File list exported to CSV: $CsvPath"
 
 # Confirm and move files based on trusted dates
 Write-Host ""
@@ -201,6 +218,7 @@ if ($ConfirmTrusted -eq "Y") {
         New-Item -ItemType Directory -Path $DestinationDir | Out-Null
       }
       Move-Item -Path $File.FileName -Destination $File.Destination
+      Log-Message "Moved file: $($File.FileName) to $($File.Destination)" "Success"
     } catch {
       Log-Message "Failed to move file: $($File.FileName)" "Error"
     }
@@ -218,11 +236,20 @@ if ($ConfirmModified -eq "Y") {
         New-Item -ItemType Directory -Path $DestinationDir | Out-Null
       }
       Move-Item -Path $File.FileName -Destination $File.Destination
+      Log-Message "Moved file: $($File.FileName) to $($File.Destination)" "Success"
     } catch {
       Log-Message "Failed to move file: $($File.FileName)" "Error"
     }
   }
 }
 
+# Log skipped files
+if ($SkippedFiles.Count -gt 0) {
+  foreach ($SkippedFile in $SkippedFiles) {
+    Log-Message "Skipped file: $($SkippedFile.FullName). No valid date metadata found." "Warning"
+  }
+}
+
+Log-Message "Script completed."
 Write-Host ""
 Write-Host "File sort operation completed." -ForegroundColor Green
