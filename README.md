@@ -8,7 +8,7 @@ A PowerShell script I put together with the help of AI to organize photos and vi
 2. Reads metadata properties (`Date Taken` or `Media Created`) from files.
 3. Attempts to parse the dates, falling back to `Date Modified` if `Date Taken` or `Media Created` are unavailable.
 4. Skips files with no valid date metadata (`Date Taken`, `Media Created`, or `Date Modified`).
-5. Displays a color-coded table of all files with statuses (e.g., "Date Taken," "Media Created," "Date Modified," or "None Found").
+5. Displays a color-coded table of all files with dates found.
 6. Prompts to confirm moving files based on `Date Taken` or `Media Created`.
 7. Optionally prompts to move skipped files based on `Date Modified`.
 8. Moves files into `Year\Month` subfolders (e.g., `2023\12` for December 2023).
