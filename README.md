@@ -1,4 +1,4 @@
-# Sort Photos and Videos by Date
+# Organise Photos and Videos by Date
 
 After struggling to find free software or a simple solution to organise my photos and videos, I decided to build this script. I liked how OneDrive automatically sorts media from my phone into `<Year>\<Month>` subfolders and wanted to apply the same structure to a large collection of existing media files. Frustrated with existing tools and options, I created this script with a bit of help (AI).
 
